@@ -1,0 +1,106 @@
+/*
+ * Device Tree overlay for Mechatracks slee-Pi 4
+ *
+ */
+/dts-v1/;
+/plugin/;
+
+/ {
+	compatible = "brcm,bcm2835";
+
+	fragment@0 {
+		target = <&i2c_arm>;
+		__overlay__ {
+			status = "okay";
+		};
+	};
+
+	fragment@1 {
+		target = <&i2c_arm>;
+		__overlay__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			rtc_hwirq: mcp79410@6f {
+				compatible = "microchip,mcp7941x";
+				reg = <0x6f>;
+				
+				pinctrl-names = "default";
+				pinctrl-0 = <&int_pin>;
+				gpios = <&gpio 26 0>;
+				
+				interrupt-names = "irq";
+				interrupt-parent = <&gpio>;
+				interrupts = <26 1>;
+			};
+		};
+	};
+	
+	fragment@2 {
+		target = <&i2c_arm>;
+		__dormant__ {
+			#address-cells = <1>;
+			#size-cells = <0>;
+
+			rtc_noirq: mcp79410@6f {
+				compatible = "microchip,mcp7941x";
+				reg = <0x6f>;
+				
+				/* wakeup-source; */
+			};
+		};
+	};
+	
+	fragment@3 {
+		target = <&gpio>;
+		__dormant__ {
+			led_pin: led_pin5 {
+				brcm,pins = <5>;
+				brcm,function = <1>; /* 1:out */
+				brcm,pull = <0>; /* 0:none */
+			};
+		};
+	};
+	
+	fragment@4 {
+		target = <&gpio>;
+		__overlay__ {
+			int_pin: int_pin26 {
+				brcm,pins = <26>;
+				brcm,function = <0>; /* 0:in */
+				brcm,pull = <0>; /* 0:none */
+			};
+		};
+	};
+	
+	fragment@5 {
+		target = <&leds>;
+		__dormant__ {
+			led0: led-sleepi {
+				label = "sleepi:led0";
+				gpios = <&gpio 5 0>;
+				
+				linux,default-trigger = "none";
+				default-state = "keep";
+			};
+		};
+	};
+	
+	fragment@6 {
+		target = <&led0>;
+		__dormant__ {
+			linux,default-trigger = "heartbeat";
+			default-state = "keep";
+		};
+	};
+	
+	__overrides__ {
+		heartbeat_pin = <&led0>,"gpios:4",
+				<&led_pin>,"brcm,pins:0";
+		cpuheartbeat =  <0>,"+3+5+6";
+		interrupt_pin = <&rtc_hwirq>,"interrupts:0",
+				<&rtc_hwirq>,"gpios:4",
+				<&int_pin>,"brcm,pins:0";
+		nointerrupt =   <0>,"-1+2-4";
+	};
+};

@@ -1,0 +1,17 @@
+Source: sleepi4-firmware
+Section: kernel
+Priority: optional
+Maintainer: Yuta Kiyonaga <kiyonaga@mechatrax.com>
+Uploaders: Masahiro Honda <honda@mechatrax.com>
+Build-Depends: debhelper-compat (= 13), device-tree-compiler
+Standards-Version: 4.7.2
+Vcs-Git: https://github.com/mechatrax/sleepi4-firmware.git
+Vcs-browser: https://github.com/mechatrax/sleepi4-firmware
+Homepage: https://mechatrax.com/
+
+Package: sleepi4-firmware
+Architecture: armhf arm64
+Conflicts: sleepi-firmware, sleepi2-firmware, sleepi3-firmware
+Depends: ${misc:Depends}, raspi-firmware, raspi-config (>=20160506)
+Description: Device tree overlay binary for slee-Pi 4
+ This package contains the device tree overlay binary for slee-Pi 4.
