@@ -7,9 +7,14 @@ set -e
 
 OVERLAY=sleepi4
 CONFIG_FILE=/boot/firmware/config.txt
+SLEEPI3_DKMS_CONF=/etc/modprobe.d/sleepi3-dkms.conf
 
 case "$1" in
     configure)
+        if [ -f "$SLEEPI3_DKMS_CONF" ] && ! dpkg-query -W -f='${Status}' sleepi3-dkms 2>/dev/null | grep -q "ok installed"; then
+            rm -f "$SLEEPI3_DKMS_CONF"
+        fi
+
         if [ -f "$CONFIG_FILE" ]; then
             sed -i '/^core_freq=/d' "$CONFIG_FILE"
             raspi-config nonint do_i2c 0
