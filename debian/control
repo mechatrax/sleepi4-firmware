@@ -11,7 +11,7 @@ Homepage: https://mechatrax.com/
 
 Package: sleepi4-firmware
 Architecture: armhf arm64
-Conflicts: sleepi-firmware, sleepi2-firmware, sleepi3-firmware
+Conflicts: sleepi-firmware, sleepi2-firmware, sleepi3-firmware, sleepi3-dkms
 Depends: ${misc:Depends}, raspi-firmware, raspi-config (>=20160506)
 Description: Device tree overlay binary for slee-Pi 4
  This package contains the device tree overlay binary for slee-Pi 4.

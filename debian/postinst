@@ -7,28 +7,33 @@ set -e
 
 OVERLAY=sleepi4
 CONFIG_FILE=/boot/firmware/config.txt
+SLEEPI3_DKMS_CONF=/etc/modprobe.d/sleepi3-dkms.conf
 
 case "$1" in
     configure)
-    if [ -f "$CONFIG_FILE" ]; then
-        raspi-config nonint do_i2c 0
-        raspi-config nonint set_config_var core_freq_fixed 1 "$CONFIG_FILE"
-        raspi-config nonint set_config_var usb_max_current_enable 1 "$CONFIG_FILE"
-        
-        if ! grep -q -E "^(device_tree_|dt)overlay=${OVERLAY}" "$CONFIG_FILE"; then
-            printf "dtoverlay=${OVERLAY}\n" >> "$CONFIG_FILE"
+        if [ -f "$SLEEPI3_DKMS_CONF" ] && ! dpkg-query -W -f='${Status}' sleepi3-dkms 2>/dev/null | grep -q "ok installed"; then
+            rm -f "$SLEEPI3_DKMS_CONF"
         fi
 
-        if ! grep -q -E "^[[:space:]]*#*[[:space:]]*dtparam=rtc=off" "$CONFIG_FILE"; then
-            if grep -q "^\[pi5\]" "$CONFIG_FILE"; then
-                sed -i '/^\[pi5\]/a dtparam=rtc=off' "$CONFIG_FILE"
-            elif grep -q "^\[all\]" "$CONFIG_FILE"; then
-                sed -i '/^\[all\]/i \[pi5]\ndtparam=rtc=off\n' "$CONFIG_FILE"
-            else
-                printf '\n[pi5]\ndtparam=rtc=off\n' >> "$CONFIG_FILE"
+        if [ -f "$CONFIG_FILE" ]; then
+            sed -i '/^core_freq=/d' "$CONFIG_FILE"
+            raspi-config nonint do_i2c 0
+            raspi-config nonint set_config_var core_freq_fixed 1 "$CONFIG_FILE"
+            raspi-config nonint set_config_var usb_max_current_enable 1 "$CONFIG_FILE"
+            if ! grep -q -E "^(device_tree_|dt)overlay=${OVERLAY}" "$CONFIG_FILE"; then
+                printf "dtoverlay=${OVERLAY}\n" >> "$CONFIG_FILE"
+            fi
+
+            if ! grep -q -E "^[[:space:]]*#*[[:space:]]*dtparam=rtc=off" "$CONFIG_FILE"; then
+                if grep -q "^\[pi5\]" "$CONFIG_FILE"; then
+                    sed -i '/^\[pi5\]/a dtparam=rtc=off' "$CONFIG_FILE"
+                elif grep -q "^\[all\]" "$CONFIG_FILE"; then
+                    sed -i '/^\[all\]/i \[pi5]\ndtparam=rtc=off\n' "$CONFIG_FILE"
+                else
+                    printf '\n[pi5]\ndtparam=rtc=off\n\n[all]\n' >> "$CONFIG_FILE"
+                fi
             fi
         fi
-    fi
     ;;
 
     abort-upgrade|abort-remove|abort-deconfigure)
