@@ -1,5 +1,14 @@
+sleepi4-firmware (1.0.0.1) trixie; urgency=medium
+
+  * debian/postinst
+    - Close [pi5] with [all] when config.txt has neither section
+    - Remove /etc/modprobe.d/sleepi3-dkms.conf
+  * debian/control: Add sleepi3-dkms to Conflicts and Breaks.
+
+ -- Yuta Kiyonaga <kiyonaga@mechatrax.com>  Mon, 16 Nov 2026 19:06:31 +0900
+
 sleepi4-firmware (1.0.0) trixie; urgency=medium
 
   * Initial release
 
- -- Masahiro Honda <honda@mechatrax.com>  Mon, 07 Jul 2025 14:44:05 +0900
+ -- Yuta Kiyonaga <kiyonaga@mechatrax.com>  Mon, 16 Nov 2026 16:19:08 +0900
